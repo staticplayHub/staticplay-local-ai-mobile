@@ -78,6 +78,40 @@ export default function ChatTab() {
     });
   }, [isUnlocked, loadMessages, selectedRoomId]);
 
+  useEffect(() => {
+    if (!selectedRoomId || !isUnlocked) {
+      return;
+    }
+    let cancelled = false;
+    let running = false;
+
+    const refresh = async () => {
+      if (running || cancelled) {
+        return;
+      }
+      running = true;
+      try {
+        const data = await getMessages(config, selectedRoomId);
+        if (!cancelled) {
+          setMessages(data);
+        }
+      } catch {
+        // Avoid noisy status updates for background polling failures.
+      } finally {
+        running = false;
+      }
+    };
+
+    const poller = setInterval(() => {
+      void refresh();
+    }, 2500);
+
+    return () => {
+      cancelled = true;
+      clearInterval(poller);
+    };
+  }, [config, isUnlocked, selectedRoomId]);
+
   async function onSend() {
     const text = composeText.trim();
     if (!selectedRoomId || (!text && !composeImageDataUrl)) {

@@ -68,6 +68,44 @@ export default function DmsTab() {
     });
   }, [isUnlocked, loadMessages, selectedThreadId]);
 
+  useEffect(() => {
+    if (!selectedThreadId || !isUnlocked) {
+      return;
+    }
+    let cancelled = false;
+    let running = false;
+
+    const refresh = async () => {
+      if (running || cancelled) {
+        return;
+      }
+      running = true;
+      try {
+        const [nextMessages, nextThreads] = await Promise.all([
+          getDmMessages(config, selectedThreadId),
+          displayName ? getDmThreads(config, displayName) : Promise.resolve([]),
+        ]);
+        if (!cancelled) {
+          setMessages(nextMessages);
+          setThreads(nextThreads);
+        }
+      } catch {
+        // Avoid noisy status updates for background polling failures.
+      } finally {
+        running = false;
+      }
+    };
+
+    const poller = setInterval(() => {
+      void refresh();
+    }, 2500);
+
+    return () => {
+      cancelled = true;
+      clearInterval(poller);
+    };
+  }, [config, displayName, isUnlocked, selectedThreadId]);
+
   async function onStartDm() {
     if (!displayName) {
       return;
