@@ -17,7 +17,8 @@ type AppStateValue = {
 
 const INVITE_KEY = 'VVXchat';
 const DEFAULT_APP_KEY = process.env.EXPO_PUBLIC_STATICPLAY_APP_KEY ?? 'VVXchat';
-const DEFAULT_BASE_URL = process.env.EXPO_PUBLIC_STATICPLAY_BASE_URL ?? 'http://127.0.0.1:8787';
+const DEFAULT_BASE_URL =
+  process.env.EXPO_PUBLIC_STATICPLAY_BASE_URL ?? 'https://stops-recently-chronicle-voters.trycloudflare.com';
 const DEFAULT_MESSAGE_TEXT_COLOR = '#e9f1ff';
 const DEFAULT_MESSAGE_BOX_COLOR = '#101a2c';
 
